@@ -3,7 +3,7 @@ consegue estilizar uma tag dentro do tittle
 consegue acessar propriedades do componente
 */
 
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 export const Container = styled.div`
   max-width: 700px;
@@ -39,9 +39,20 @@ export const Form = styled.form`
   }
 `;
 
-export const SubmitButton = styled.button.attrs({
+const rotate = keyframes` /* keyframes para fazer animações, inicia no from, termina no to */
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+  `;
+
+export const SubmitButton = styled.button.attrs((props) => ({
+  // attrs = atributos, para poder acessar loading
   type: 'submit',
-})`
+  disabled: props.loading, // quando loading for true, disabled é true
+}))`
   background: #7159c1;
   border: 0;
   padding: 0 15px;
@@ -51,4 +62,46 @@ export const SubmitButton = styled.button.attrs({
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &[disabled] {
+    /* estilização para o botão quando disabled for true  */
+    cursor: not-allowed;
+    opacity: 0, 6;
+  }
+
+  ${(props) =>
+    props.loading &&
+    /* como aqui não precisa de else não usa "? :", usa && se loading for true aplica css */
+    css`
+      /* conjunto de css a um elemento conforme uma condição/propriedade */
+      svg {
+        animation: ${rotate} 2s linear infinite; /* animação linear e infinita */
+      }
+    `}
+`;
+
+export const List = styled.ul`
+  list-style: none; /* tira a bolinha da listagem */
+  margin-top: 30px;
+
+  li {
+    /* estilização para cada item da lista */
+    padding: 15px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    /* adicionar uma borda cinza entre dois repositórios, para separar */
+    /* pega todos li e qualquer li que seja seguido por um anterior, ou seja aplica para todos menos no primeiro */
+    & + li {
+      border-top: 1px solid #eee;
+    }
+
+    a {
+      /* estilização do link "detalhe" */
+      color: #7159c1;
+      text-decoration: none; /* para tirar o underline do link */
+    }
+  }
 `;
