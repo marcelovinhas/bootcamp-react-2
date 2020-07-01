@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-
 import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
@@ -14,6 +14,26 @@ export default class Main extends Component {
     newRepo: '',
     loading: false, // para desabilitar o botão enquanto o repositório está sendo adicionado
   };
+
+  // carrega os dados do localStorage em inspecionar
+  componentDidMount() {
+    const repositories = localStorage.getItem('repositories');
+
+    if (repositories) {
+      // se tiver algo em repositories, preenche os repositórios passando de JSON para valor objeto do JS
+      this.setState({ repositories: JSON.parse(repositories) });
+    }
+  }
+
+  // salva os dados no localStorage
+  componentDidUpdate(_, prevState) {
+    const { repositories } = this.state;
+    // ve se o estado anterior mudou comparado ao atual
+    if (prevState.repositories !== repositories) {
+      // se atualizou a informação salva nos repositórios, JSON.stringify para passar para JSON
+      localStorage.setItem('repositories', JSON.stringify(repositories));
+    }
+  }
 
   handleInputChange = (e) => {
     // handleInputChange recebe um evento
@@ -75,9 +95,12 @@ export default class Main extends Component {
           {repositories.map((repository) => (
             // map precisa de key com uma informação única, a única informação única é o nome do repositório
             <li key={repository.name}>
-              <span>{repository.name}</span>
               {/* para mostrar o nome do repositório */}
-              <a href="">Detalhes</a>
+              <span>{repository.name}</span>
+              {/* encondeURIComponent para transformar a barra / do link em carácter especial %2F */}
+              <Link to={`/repository/${encodeURIComponent(repository.name)}`}>
+                Detalhes
+              </Link>
             </li>
           ))}
         </List>
