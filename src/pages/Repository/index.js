@@ -1,6 +1,12 @@
+/* eslint-disable react/state-in-constructor */
+/* eslint-disable react/static-property-placement */
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
+
+import Container from '../../components/Container';
+import { Loading, Owner, IssueList } from './styles';
 
 // passou de função para classe para usar state e componentDidMount
 export default class Repository extends Component {
@@ -49,6 +55,43 @@ export default class Repository extends Component {
   render() {
     const { repository, issues, loading } = this.state;
 
-    return <h1>Repository</h1>;
+    // mostra se está carregando os dados do repositório
+    if (loading) {
+      // se loading existir
+      return <Loading>Carregando</Loading>;
+    }
+
+    return (
+      <Container>
+        <Owner>
+          <Link to="/">Voltar aos repositórios</Link>
+          {/* retorna a url do avatar do dono do repositório, alt é obrigatório */}
+          <img src={repository.owner.avatar_url} alt={repository.owner.login} />
+          <h1>{repository.name}</h1>
+          <p>{repository.description}</p>
+        </Owner>
+
+        <IssueList>
+          {issues.map((issue) => (
+            // map para percorrer as issues e retorna a issue em si, em key o padrão é retornar string
+            <li key={String(issue.id)}>
+              {/* avatar do criador da issue, alt é obrigatório e retorna o nome do usuário */}
+              <img src={issue.user.avatar_url} alt={issue.user.login} />
+              <div>
+                <strong>
+                  {/* href={issue.html_url} pois não é um link interno, não usa link do react-router-dom */}
+                  <a href={issue.html_url}>{issue.title}</a>
+                  {issue.labels.map((label) => (
+                    <span key={String(label.id)}>{label.name}</span>
+                  ))}
+                </strong>
+                {/* nome do autor da isue */}
+                <p>{issue.user.login}</p>
+              </div>
+            </li>
+          ))}
+        </IssueList>
+      </Container>
+    );
   }
 }
